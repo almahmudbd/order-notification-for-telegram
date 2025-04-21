@@ -8,10 +8,8 @@
 
 namespace NineKolor\TelegramWC\Classes;
 
-
 class WooCommerce
 {
-
     public $pattern;
     public $order;
     public $order_id;
@@ -21,18 +19,17 @@ class WooCommerce
     {
         $this->pattern = array();
         $this->status_access = array();
-        $this->order =  wc_get_order( $order_id );
-        $this->order_id =  $order_id;
-        add_filter( 'nktgnfw_filter_code_template',array($this,'filterTemplate'), 10, 2 );
-
+        $this->order = wc_get_order($order_id);
+        $this->order_id = $order_id;
+        add_filter('nktgnfw_filter_code_template', array($this, 'filterTemplate'), 10, 2);
     }
 
     public function getBillingDetails($str)
     {
         $this->decodeShortcode($str);
         $pr = $this->getProducts();
-        $str = str_replace(array_keys($pr),array_values($pr),$str);
-        return str_replace(array_keys($this->pattern), array_values($this->pattern),$str);
+        $str = str_replace(array_keys($pr), array_values($pr), $str);
+        return str_replace(array_keys($this->pattern), array_values($this->pattern), $str);
     }
 
     private function decodeShortcode($str)
@@ -40,45 +37,52 @@ class WooCommerce
         $re = '/\{.+?}/m';
         preg_match_all($re, $str, $matches, PREG_SET_ORDER, 0);
         array_walk_recursive($matches, function ($item, $key) {
-            $pattern = explode('-',preg_replace('/\{|\}/','',$item));
-            if (count($pattern)>1){
-                $this->pattern[$item] = (string)$this->order->data[$pattern[0]][$pattern[1]];
-            }else{
-                $res = preg_replace('/\{|\}/','',$item);
-                $_result = $this->order->data[$res];
-                if ($_result) {
-                    $this->pattern[$item] = $_result;
-                }else{
-                    $this->pattern[$item] = $this->order->get_meta($res)?:'';
+            $pattern = explode('-', preg_replace('/\{|\}/', '', $item));
+            if (count($pattern) > 1) {
+                // Updated to use getter methods instead of direct data access
+                $method_name = 'get_' . $pattern[0] . '_' . $pattern[1];
+                if (method_exists($this->order, $method_name)) {
+                    $this->pattern[$item] = (string)$this->order->$method_name();
+                } else {
+                    $this->pattern[$item] = '';
+                }
+            } else {
+                $res = preg_replace('/\{|\}/', '', $item);
+                $method_name = 'get_' . $res;
+                if (method_exists($this->order, $method_name)) {
+                    $this->pattern[$item] = $this->order->$method_name();
+                } else {
+                    $this->pattern[$item] = $this->order->get_meta($res) ?: '';
                 }
             }
         });
 
-        $this->pattern = apply_filters( 'nktgnfw_filter_code_template', $this->pattern,$this->order_id);
+        $this->pattern = apply_filters('nktgnfw_filter_code_template', $this->pattern, $this->order_id);
     }
 
-
-    public function getProducts() {
-        $items =  $this->order->get_items();
+    public function getProducts()
+    {
+        $items = $this->order->get_items();
         $product = chr(10);
-        if(!empty($items)) {
+        if (!empty($items)) {
             foreach ($items as $item) {
                 $product_item = $item->get_product();
                 if ($product_item) {
-                    $product .= ' -' . $item['name'] . '   x' . $item['quantity'] . '  ' . wc_price($item['total']) . chr(10);
+                    $product .= ' -' . $item->get_name() . '   x' . $item->get_quantity() . '  ' . wc_price($item->get_total()) . chr(10);
                 }
             }
         }
         $return['{products}'] = $product;
-        $shop = $this->order->get_items( 'shipping' );
-        if ($shop) {
-            $shipping  = end($shop)->get_data();
-            $return['{shipping_method_title}'] = $shipping['method_title'];
+        $shipping_items = $this->order->get_items('shipping');
+        if ($shipping_items) {
+            $shipping = end($shipping_items);
+            $return['{shipping_method_title}'] = $shipping->get_method_title();
         }
         return $return;
     }
 
-    public function filterTemplate($replace){
+    public function filterTemplate($replace)
+    {
         $replace['{order_id}'] = $this->order_id;
         $replace['{order_status}'] = wc_get_order_status_name($this->order->get_status());
         $replace['{total}'] = wc_price($this->order->get_total());
