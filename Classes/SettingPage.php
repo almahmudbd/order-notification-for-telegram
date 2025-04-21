@@ -1,178 +1,348 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thanhlam
- * Date: 15/01/2021
- * Time: 22:57
- */
+namespace OrderNotificationTelegram\Classes;
 
-namespace NineKolor\TelegramWC\Classes;
-
-
-class SettingPage extends \WC_Settings_Page
-{
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-
-        $this->id = 'nktgnfw';
-        add_filter('woocommerce_settings_tabs_array', array($this, 'add_settings_tab'), 50);
+class SettingPage extends \WC_Settings_Page {
+    public function __construct() {
+        $this->id = 'ontg_settings';
+        $this->label = __('Telegram Notifications', 'order-notification-for-telegram');
+        
         add_action('woocommerce_settings_' . $this->id, array($this, 'output'));
         add_action('woocommerce_settings_save_' . $this->id, array($this, 'save'));
-
+        
+        parent::__construct();
     }
-
-    public function add_settings_tab($settings_tabs)
-    {
-        $settings_tabs[$this->id] = __('Telegram Notification', 'nktgnfw');
-        return $settings_tabs;
+    
+    public function output() {
+        global $current_section;
+        
+        // Header
+        echo $this->render_header();
+        
+        // Settings Fields
+        $settings = $this->get_settings($current_section);
+        \WC_Admin_Settings::output_fields($settings);
+        
+        // Template Guide & Test Section
+        echo $this->render_template_guide();
+        echo $this->render_test_section();
     }
-
-    public function get_settings($section = null)
-    {
+    
+    private function render_header() {
+        return sprintf(
+            '<div class="ontg-header">
+                <h1><span class="dashicons dashicons-admin-plugins"></span>%s</h1>
+                <p>%s | %s</p>
+            </div>',
+            esc_html__('Telegram Notifications for WooCommerce', 'order-notification-for-telegram'),
+            sprintf(__('Version %s', 'order-notification-for-telegram'), ONTG_VERSION),
+            sprintf(
+                __('By %s', 'order-notification-for-telegram'),
+                '<a href="https://profiles.wordpress.org/almahmudbd" target="_blank">Al Mahmud</a>'
+            )
+        );
+    }
+    
+    public function get_settings($section = '') {
         $settings = array(
-            'section_title_1' => array(
-                'name' => __('Settings', 'nktgnfw'),
-                'type' => 'title',
-                'desc' => $this->renderHelpDescription(),
-                'id' => 'wc_settings_tab_nktgnfw_title_1'
+            // Basic Settings Section
+            array(
+                'title' => __('Basic Settings', 'order-notification-for-telegram'),
+                'type'  => 'title',
+                'desc'  => $this->get_basic_help_text(),
+                'id'    => 'ontg_basic_section'
             ),
-            'token' => array(
-                'name' => __('Token', 'nktgnfw'),
-                'type' => 'text',
-                'id' => 'nktgnfw_setting_token',
+            array(
+                'title'    => __('Bot Token', 'order-notification-for-telegram'),
+                'type'     => 'text',
+                'desc'     => __('Enter your Telegram bot token from @BotFather', 'order-notification-for-telegram'),
+                'id'       => 'ontg_bot_token',
+                'default'  => '',
+                'class'    => 'regular-text',
+                'css'      => 'min-width: 400px;',
                 'desc_tip' => true,
-                'desc' => __('Type your API Token. Chat @BotFather to get it', 'nktgnfw')
             ),
-            'chatid' => array(
-                'name' => __('ChatID / GroupID', 'nktgnfw'),
-                'type' => 'text',
-                'id' => 'nktgnfw_setting_chatid',
+            array(
+                'title'    => __('Chat ID', 'order-notification-for-telegram'),
+                'type'     => 'text',
+                'desc'     => __('Enter your Telegram chat ID from @userinfobot', 'order-notification-for-telegram'),
+                'id'       => 'ontg_chat_id',
+                'default'  => '',
+                'class'    => 'regular-text',
+                'css'      => 'min-width: 400px;',
                 'desc_tip' => true,
-                'desc' => __('Type your Chat ID. May be group or user', 'nktgnfw')
             ),
-            'sending_after_order_status_changed' => array(
-                'name' => __('Order status changed', 'nktgnfw'),
-                'type' => 'checkbox',
-                'id' => 'nktgnfw_send_after_order_status_changed',
-                'desc_tip' => true,
-                'desc' => __('Allows sending message after order status changed (Apply below order statuses). If enabled, sending notification for a new order is disabled', 'nktgnfw')
-            ),
-            'order_statuses' => array(
-                'name' => __('Select order statuses', 'nktgnfw'),
-                'type' => 'multiselect',
-                'id' => 'nktgnfw_order_statuses',
-                'options' => wc_get_order_statuses(),
-                'class' => 'wc-enhanced-select',
-                'desc_tip' => true,
-                'desc' => __('Select one or more statuses for which this notification will be sent', 'nktgnfw')
-            ),
-            'message_template' => array(
-                'name' => __('Message Template', 'nktgnfw'),
-                'type' => 'textarea',
-                'id' => 'nktgnfw_setting_template',
-                'class' => 'code',
-                'css' => 'max-width:550px;width:100%',
-                'default'=>'A new order has been placed at {order_date_created}'.chr(10).'ORDER_ID: <b>#{order_id}</b>'.chr(10).'Products: {products}'.chr(10).'Total: <b>{total}</b>',
-                'custom_attributes' => ['rows' => 10],
-            ),
-            'section_end' => array(
+            array(
                 'type' => 'sectionend',
-                'id' => 'wc_settings_tab_nktgnfw_end_section_2'
+                'id'   => 'ontg_basic_section_end'
+            ),
+            
+            // Notification Settings Section
+            array(
+                'title' => __('Notification Settings', 'order-notification-for-telegram'),
+                'type'  => 'title',
+                'id'    => 'ontg_notification_section'
+            ),
+            array(
+                'title'   => __('Send Notifications On', 'order-notification-for-telegram'),
+                'type'    => 'radio',
+                'id'      => 'ontg_send_on_status_change',
+                'options' => array(
+                    'no'  => __('New Order Only', 'order-notification-for-telegram'),
+                    'yes' => __('Order Status Change', 'order-notification-for-telegram')
+                ),
+                'default' => 'no',
+            ),
+            array(
+                'title'    => __('Order Statuses', 'order-notification-for-telegram'),
+                'type'     => 'multiselect',
+                'desc'     => __('Select order statuses that trigger notifications (Only applicable if "Order Status Change" is selected above)', 'order-notification-for-telegram'),
+                'id'       => 'ontg_order_statuses',
+                'class'    => 'wc-enhanced-select',
+                'options'  => wc_get_order_statuses(),
+                'default'  => array('wc-processing'),
+                'css'      => 'min-width: 350px;',
+            ),
+            array(
+                'type' => 'sectionend',
+                'id'   => 'ontg_notification_section_end'
+            ),
+            
+            // Message Template Section
+            array(
+                'title' => __('Message Template', 'order-notification-for-telegram'),
+                'type'  => 'title',
+                'desc'  => __('Customize your notification message using the placeholders below.', 'order-notification-for-telegram'),
+                'id'    => 'ontg_template_section'
+            ),
+            array(
+                'title'    => __('Message Template', 'order-notification-for-telegram'),
+                'type'     => 'textarea',
+                'id'       => 'ontg_message_template',
+                'default'  => $this->get_default_template(),
+                'css'      => 'min-width: 500px; min-height: 200px; font-family: monospace;',
+                'class'    => 'code'
+            ),
+            array(
+                'type' => 'sectionend',
+                'id'   => 'ontg_template_section_end'
             ),
         );
-        return apply_filters('wc_settings_tab_nktgnfw_settings', $settings, $section);
-
+        
+        return apply_filters('ontg_settings', $settings, $section);
     }
-
-    public function renderHelpDescription()
-    {
-        $token_help = wp_kses(__("Just talk to BotFather <a href='https://telegram.im/BotFather' target='_blank'>@BotFather</a> and text <code>/start</code>, then <code>/newbot</code>, finally <code>YourNameBot</code> (Note: your bot name must end with Bot, ex: ChoPluginBot). Once you've created a bot and received your authorization token.", 'nktgnfw'), array('a' => ['href' => 'https://telegram.im/BotFather','target' =>'_blank'], 'code' => []));
-        $chatid_help = wp_kses(__("To get Chat ID, just talk to  <a href='https://telegram.im/userinfobot' target='_blank'>@userinfobot</a> and text <code>/start</code>", "nktgnfw"), ['a' => ['href' => 'https://telegram.im/userinfobot','target' =>'_blank'], 'code' => []]);
-        return $token_help . chr(10) . $chatid_help;
+    
+    private function get_basic_help_text() {
+        $help = '<div class="ontg-help-text">';
+        $help .= '<p><strong>' . __('Quick Setup Guide:', 'order-notification-for-telegram') . '</strong></p>';
+        $help .= '<ol>';
+        
+        // Step 1: Bot Token
+        $help .= '<li>' . sprintf(
+            __('Create a Telegram bot: Message %s and send:', 'order-notification-for-telegram'),
+            '<a href="https://t.me/BotFather" target="_blank">@BotFather</a>'
+        ) . '
+            <ul>
+                <li><code>/start</code></li>
+                <li><code>/newbot</code></li>
+                <li>' . __('Follow the instructions and copy the bot token', 'order-notification-for-telegram') . '</li>
+            </ul>
+        </li>';
+        
+        // Step 2: Chat ID
+        $help .= '<li>' . sprintf(
+            __('Get your Chat ID: Message %s and send %s', 'order-notification-for-telegram'),
+            '<a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>',
+            '<code>/start</code>'
+        ) . '</li>';
+        
+        // Step 3: Configuration
+        $help .= '<li>' . __('Enter both the Bot Token and Chat ID above', 'order-notification-for-telegram') . '</li>';
+        
+        $help .= '</ol>';
+        $help .= '</div>';
+        
+        return $help;
     }
-
-    public function renderAllowTagsDescription()
-    {
+    
+    private function render_template_guide() {
         ob_start();
         ?>
-        <style>
-            .row {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between;
-            }
+        <div class="ontg-template-guide">
+            <h2><?php _e('Template Guide', 'order-notification-for-telegram'); ?></h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Available Placeholders -->
+                <div class="ontg-placeholders">
+                    <h3><?php _e('Available Placeholders', 'order-notification-for-telegram'); ?></h3>
+                    <table class="widefat">
+                        <thead>
+                            <tr>
+                                <th><?php _e('Placeholder', 'order-notification-for-telegram'); ?></th>
+                                <th><?php _e('Description', 'order-notification-for-telegram'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $placeholders = array(
+                                '{order_id}' => __('Order ID', 'order-notification-for-telegram'),
+                                '{order_date_created}' => __('Order Date and Time', 'order-notification-for-telegram'),
+                                '{total}' => __('Order Total Amount', 'order-notification-for-telegram'),
+                                '{products}' => __('Product List', 'order-notification-for-telegram'),
+                                '{billing_first_name}' => __('Customer\'s First Name', 'order-notification-for-telegram'),
+                                '{billing_phone}' => __('Customer\'s Phone', 'order-notification-for-telegram'),
+                                '{billing_address_1}' => __('Address Line 1', 'order-notification-for-telegram'),
+                                '{billing_city}' => __('City', 'order-notification-for-telegram'),
+                                '{payment_method}' => __('Payment Method', 'order-notification-for-telegram'),
+                            );
+                            
+                            foreach ($placeholders as $placeholder => $description) {
+                                printf(
+                                    '<tr><td><code>%s</code></td><td>%s</td></tr>',
+                                    esc_html($placeholder),
+                                    esc_html($description)
+                                );
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- HTML Tags -->
+                <div class="ontg-html-tags">
+                    <h3><?php _e('Supported HTML Tags', 'order-notification-for-telegram'); ?></h3>
+                    <table class="widefat">
+                        <thead>
+                            <tr>
+                                <th><?php _e('Tag', 'order-notification-for-telegram'); ?></th>
+                                <th><?php _e('Example', 'order-notification-for-telegram'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $tags = array(
+                                '<b>' => __('Bold text', 'order-notification-for-telegram'),
+                                '<i>' => __('Italic text', 'order-notification-for-telegram'),
+                                '<u>' => __('Underlined text', 'order-notification-for-telegram'),
+                                '<s>' => __('Strikethrough text', 'order-notification-for-telegram'),
+                                '<code>' => __('Monospace text', 'order-notification-for-telegram'),
+                                '<a href="">' => __('Link', 'order-notification-for-telegram'),
+                            );
+                            
+                            foreach ($tags as $tag => $example) {
+                                printf(
+                                    '<tr><td><code>%s</code></td><td>%s</td></tr>',
+                                    esc_html($tag),
+                                    esc_html($example)
+                                );
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Example Template -->
+            <div class="ontg-example-template" style="margin-top: 20px;">
+                <h3><?php _e('Example Template', 'order-notification-for-telegram'); ?></h3>
+                <pre style="background: #f8f8f8; padding: 15px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap;">
+New order at {order_date_created}, ORDER ID: <b>#{order_id}</b>
+--
+address: 
+{billing_first_name} 
+{billing_address_1}, {billing_city}.
+{billing_phone}
 
-            .left {
-                width: 50%;
-            }
-            .padding{
-                padding: 0 10px;
-            }
-            @media (max-width: 768px) {
-                .left{
-                    width: 98%;
-                }
-            }
-            textarea.code {
-                background-color: #141414;
-                color: #F8F8F8;
-                width: 100%;
-                font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
-            }
-        </style>
-        <div class="row">
-            <table class="form-table">
-                <tbody>
-                <tr>
-                    <th></th>
-                    <td> <button id="nktgnfw_send_test_message" type="button" class="button-primary"><?= __('Send test message','nktgnfw')?></button></td>
-                </tr>
-                <tr>
-                    <th><h4><?= __('Allow tags for Telegram Message', 'nktgnfw') ?></h4></th>
-                    <td><textarea class="code wp-editor-area" rows="15" readonly><b>bold</b>&#10;<strong>bold</strong>&#10;<i>italic</i>&#10;<em>italic</em>&#10;<u>underline</u>&#10;<ins>underline</ins>&#10;<s>strikethrough</s>&#10;<strike>strikethrough</strike>&#10;<del>strikethrough</del>&#10;<a href="http://www.domain.com/">inline URL</a>&#10;<code>code</code>&#10;<pre>code block</pre></textarea></td>
-                </tr>
-                <tr>
-                    <th><h4><?= __('Shortcodes for Telegram Message', 'nktgnfw') ?></h4></th>
-                    <td><textarea class="code wp-editor-area" rows="15" readonly>{order_id}&#10;{order_date_created}&#10;{order_status}&#10;{products}&#10;{total}&#10;{billing-first_name}&#10;{billing-last_name}&#10;{billing-address_1}&#10;{billing-address_2}&#10;{billing-city}&#10;{billing-state}&#10;{billing-postcode}&#10;{billing-email}&#10;{billing-phone}&#10;{payment_method}&#10;{payment_method_title}&#10;{customer_ip_address}&#10;{customer_user_agent}
-                        </textarea></td>
-                </tr>
-                <tr>
-                    <th></th>
-                    <td><?= wp_kses(__("Visit <a href='https://choplugins.com' target='_blank'>our website</a> to get more useful plugins", "nktgnfw"), ['a' => ['href' => 'https://choplugins.com','target' =>'_blank']]); ?></td>
-                </tr>
-                </tbody>
-            </table>
+--
+Products: {products}
+Total: <b>{total}</b> 
+- {payment_method}
+
+---
+(<a href="admin_url/post.php?post={order_id}&action=edit">check order</a>) | (mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>) | copy: <code>{billing_phone}</code>
+                </pre>
+            </div>
         </div>
         <?php
-        $content = ob_get_contents();
-        ob_clean();
-        ob_end_flush();
-        return $content;
+        return ob_get_clean();
     }
-    public function renderHeaderSettingPage(){
-        return '<div id="nktgnfw-header">
-			<a href="https://choplugins.com" target="_blank"><img class="nktgnfw-header-logo" src="'.plugin_dir_url(__DIR__).'assets/images/tele_woo.svg" alt="Telegram Notification for Woocommerce"></a>
-		    </div>';
+    
+    private function render_test_section() {
+        ob_start();
+        ?>
+        <div class="ontg-test-section">
+            <h2><?php _e('Test Your Settings', 'order-notification-for-telegram'); ?></h2>
+            <p><?php _e('Send a test message to verify your Telegram notification settings.', 'order-notification-for-telegram'); ?></p>
+            
+            <button type="button" class="button button-primary" id="ontg-test-button">
+                <?php _e('Send Test Message', 'order-notification-for-telegram'); ?>
+            </button>
+            <span class="spinner" style="float: none; margin-top: 0;"></span>
+            <p class="ontg-test-result" style="display: none; margin-top: 10px;"></p>
+        </div>
+        
+        <script>
+        jQuery(document).ready(function($) {
+            $('#ontg-test-button').click(function() {
+                var $button = $(this);
+                var $spinner = $button.next('.spinner');
+                var $result = $('.ontg-test-result');
+                
+                $button.prop('disabled', true);
+                $spinner.css('visibility', 'visible');
+                $result.hide();
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'ontg_test_notification',
+                        nonce: '<?php echo wp_create_nonce('ontg_test_notification'); ?>'
+                    },
+                    success: function(response) {
+                        $result.html(response.data)
+                              .removeClass('notice-error notice-success')
+                              .addClass(response.success ? 'notice-success' : 'notice-error')
+                              .show();
+                    },
+                    error: function() {
+                        $result.html('<?php _e('Error: Could not send test message.', 'order-notification-for-telegram'); ?>')
+                              .removeClass('notice-success')
+                              .addClass('notice-error')
+                              .show();
+                    },
+                    complete: function() {
+                        $button.prop('disabled', false);
+                        $spinner.css('visibility', 'hidden');
+                    }
+                });
+            });
+        });
+        </script>
+        <?php
+        return ob_get_clean();
     }
-    /**
-     * Output the settings
-     */
-    public function output()
-    {   echo $this->renderHeaderSettingPage();
-        $settings = $this->get_settings();
-        \WC_Admin_Settings::output_fields($settings);
-        echo $this->renderAllowTagsDescription();
-    }
+    
+    private function get_default_template() {
+        return <<<TEMPLATE
+New order at {order_date_created}, ORDER ID: <b>#{order_id}</b>
+--
+address: 
+{billing_first_name} 
+{billing_address_1}, {billing_city}.
+{billing_phone}
 
-    /**
-     * Save settings
-     */
-    public function save()
-    {
-        $settings = $this->get_settings();
-        \WC_Admin_Settings::save_fields($settings);
+--
+Products: {products}
+Total: <b>{total}</b> 
+- {payment_method}
+
+---
+(<a href="admin_url/post.php?post={order_id}&action=edit">check order</a>) | (mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>) | copy: <code>{billing_phone}</code>
+TEMPLATE;
+    }
+    
+    public function save() {
+        global $current_section;
+        \WC_Admin_Settings::save_fields($this->get_settings($current_section));
     }
 }

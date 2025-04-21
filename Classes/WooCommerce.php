@@ -1,92 +1,85 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thanhlam
- * Date: 15/01/2021
- * Time: 21:58
- */
+namespace OrderNotificationTelegram\Classes;
 
-namespace NineKolor\TelegramWC\Classes;
-
-class WooCommerce
-{
-    public $pattern;
-    public $order;
-    public $order_id;
-    public $status_access;
-
-    function __construct($order_id)
-    {
-        $this->pattern = array();
-        $this->status_access = array();
-        $this->order = wc_get_order($order_id);
-        $this->order_id = $order_id;
-        add_filter('nktgnfw_filter_code_template', array($this, 'filterTemplate'), 10, 2);
+class WooCommerce {
+    private $order;
+    private $placeholders = [];
+    
+    public function __construct($order) {
+        $this->order = $order;
+        $this->setup_placeholders();
     }
-
-    public function getBillingDetails($str)
-    {
-        $this->decodeShortcode($str);
-        $pr = $this->getProducts();
-        $str = str_replace(array_keys($pr), array_values($pr), $str);
-        return str_replace(array_keys($this->pattern), array_values($this->pattern), $str);
+    
+    public function get_formatted_message($template) {
+        return strtr($template, $this->placeholders);
     }
-
-    private function decodeShortcode($str)
-    {
-        $re = '/\{.+?}/m';
-        preg_match_all($re, $str, $matches, PREG_SET_ORDER, 0);
-        array_walk_recursive($matches, function ($item, $key) {
-            $pattern = explode('-', preg_replace('/\{|\}/', '', $item));
-            if (count($pattern) > 1) {
-                // Updated to use getter methods instead of direct data access
-                $method_name = 'get_' . $pattern[0] . '_' . $pattern[1];
-                if (method_exists($this->order, $method_name)) {
-                    $this->pattern[$item] = (string)$this->order->$method_name();
-                } else {
-                    $this->pattern[$item] = '';
-                }
-            } else {
-                $res = preg_replace('/\{|\}/', '', $item);
-                $method_name = 'get_' . $res;
-                if (method_exists($this->order, $method_name)) {
-                    $this->pattern[$item] = $this->order->$method_name();
-                } else {
-                    $this->pattern[$item] = $this->order->get_meta($res) ?: '';
-                }
-            }
-        });
-
-        $this->pattern = apply_filters('nktgnfw_filter_code_template', $this->pattern, $this->order_id);
+    
+    private function setup_placeholders() {
+        // Order details
+        $this->placeholders['{order_id}'] = $this->order->get_id();
+        $this->placeholders['{order_date_created}'] = $this->order->get_date_created()->date_i18n('F j, Y g:i a');
+        $this->placeholders['{order_status}'] = wc_get_order_status_name($this->order->get_status());
+        $this->placeholders['{total}'] = $this->order->get_formatted_order_total();
+        $this->placeholders['{order_total}'] = $this->order->get_formatted_order_total();
+        
+        // Payment method - fix both variants
+        $this->placeholders['{payment_method}'] = $this->order->get_payment_method_title();
+        $this->placeholders['{payment_method_title}'] = $this->order->get_payment_method_title();
+        
+        // Support both - and _ in billing fields for backward compatibility
+        $billing_fields = [
+            'first_name', 'last_name', 'company', 
+            'address_1', 'address_2', 'city',
+            'state', 'postcode', 'country',
+            'email', 'phone'
+        ];
+        
+        foreach ($billing_fields as $field) {
+            $method = 'get_billing_' . $field;
+            $value = $this->order->$method();
+            
+            // Support both formats
+            $this->placeholders['{billing_' . $field . '}'] = $value;
+            $this->placeholders['{billing-' . $field . '}'] = $value;
+        }
+        
+        // Products
+        $this->placeholders['{products}'] = $this->get_products_list();
+        
+        // Additional placeholders
+        $this->placeholders['{order_date}'] = $this->order->get_date_created()->date_i18n('F j, Y g:i a');
     }
-
-    public function getProducts()
-    {
+    
+    private function get_products_list() {
         $items = $this->order->get_items();
-        $product = chr(10);
-        if (!empty($items)) {
-            foreach ($items as $item) {
-                $product_item = $item->get_product();
-                if ($product_item) {
-                    $product .= ' -' . $item->get_name() . '   x' . $item->get_quantity() . '  ' . wc_price($item->get_total()) . chr(10);
-                }
+        if (empty($items)) {
+            return '';
+        }
+        
+        $list = "\n";
+        foreach ($items as $item) {
+            $list .= sprintf(
+                " -%s%s   x%d  ৳%s\n",
+                $item->get_name(),
+                ($item->get_variation_id() ? ' - ' . $this->get_variation_attribute_string($item) : ''),
+                $item->get_quantity(),
+                number_format($item->get_total(), 2)
+            );
+        }
+        
+        return $list;
+    }
+    
+    private function get_variation_attribute_string($item) {
+        $variation_data = $item->get_meta_data();
+        $attributes = [];
+        
+        foreach ($variation_data as $meta) {
+            if (strpos($meta->key, 'pa_') === false) {
+                $attributes[] = $meta->value;
             }
         }
-        $return['{products}'] = $product;
-        $shipping_items = $this->order->get_items('shipping');
-        if ($shipping_items) {
-            $shipping = end($shipping_items);
-            $return['{shipping_method_title}'] = $shipping->get_method_title();
-        }
-        return $return;
-    }
-
-    public function filterTemplate($replace)
-    {
-        $replace['{order_id}'] = $this->order_id;
-        $replace['{order_status}'] = wc_get_order_status_name($this->order->get_status());
-        $replace['{total}'] = wc_price($this->order->get_total());
-        $replace['{order_date_created}'] = $this->order->get_date_created()->date(get_option('links_updated_date_format'));
-        return $replace;
+        
+        return implode(', ', $attributes);
     }
 }

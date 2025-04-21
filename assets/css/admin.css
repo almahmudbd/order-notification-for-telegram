@@ -1,1 +1,53 @@
 #nktgnfw-header{background-color:#fff}#nktgnfw-header a{display:block}#nktgnfw-header .nktgnfw-header-logo{width:100%;max-width:400px;height:auto}
+
+.ontg-header {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.ontg-header h1 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ontg-template-guide table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.ontg-template-guide th,
+.ontg-template-guide td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+.ontg-template-guide th {
+    background: #f8f8f8;
+    text-align: left;
+}
+
+.ontg-test-section .notice {
+    margin: 10px 0;
+    padding: 10px;
+}
+
+.ontg-test-result {
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.notice-success {
+    border-left: 4px solid #46b450;
+    background: #ecf7ed;
+}
+
+.notice-error {
+    border-left: 4px solid #dc3232;
+    background: #fbeaea;
+}
