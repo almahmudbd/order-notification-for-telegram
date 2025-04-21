@@ -37,7 +37,7 @@ class SettingPage extends \WC_Settings_Page {
             sprintf(__('Version %s', 'order-notification-for-telegram'), ONTG_VERSION),
             sprintf(
                 __('By %s', 'order-notification-for-telegram'),
-                '<a href="https://profiles.wordpress.org/almahmudbd" target="_blank">Al Mahmud</a>'
+                '<a href="https://github.com/almahmudbd" target="_blank">Al Mahmud</a>'
             )
         );
     }
@@ -337,7 +337,7 @@ Total: <b>{total}</b>
 - {payment_method}
 
 ---
-(<a href="admin_url/post.php?post={order_id}&action=edit">check order</a>) | (mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>) | copy: <code>{billing_phone}</code>
+(<a href="' . admin_url("post.php?post={order_id}&action=edit") . '">check order</a>)) | (mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>) | copy: <code>{billing_phone}</code>
 TEMPLATE;
     }
     

@@ -11,6 +11,8 @@ class WooCommerce {
     }
     
     public function get_formatted_message($template) {
+        // Replace admin_url placeholder
+        $template = str_replace('admin_url', admin_url(), $template);
         return strtr($template, $this->placeholders);
     }
     
@@ -22,7 +24,7 @@ class WooCommerce {
         $this->placeholders['{total}'] = $this->order->get_formatted_order_total();
         $this->placeholders['{order_total}'] = $this->order->get_formatted_order_total();
         
-        // Payment method - fix both variants
+        // Payment method - support both variants
         $this->placeholders['{payment_method}'] = $this->order->get_payment_method_title();
         $this->placeholders['{payment_method_title}'] = $this->order->get_payment_method_title();
         
@@ -75,7 +77,7 @@ class WooCommerce {
         $attributes = [];
         
         foreach ($variation_data as $meta) {
-            if (strpos($meta->key, 'pa_') === false) {
+            if (strpos($meta->key, 'pa_') === false && !empty($meta->value)) {
                 $attributes[] = $meta->value;
             }
         }

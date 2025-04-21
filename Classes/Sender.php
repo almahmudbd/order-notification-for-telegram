@@ -2,11 +2,10 @@
 namespace OrderNotificationTelegram\Classes;
 
 class Sender {
-    public $chatID;
-    public $token;
-    public $parseMode;
-    public $accessTags;
-    private $api_url = 'https://api.telegram.org/bot%s/sendMessage';
+    private $chatID;
+    private $token;
+    private $parseMode;
+    private $accessTags;
 
     public function __construct() {
         $this->chatID = '';
@@ -26,49 +25,50 @@ class Sender {
             return false;
         }
 
-        // Clean and prepare the message
-        $message = strip_tags($message, $this->accessTags);
-        return $this->postTelegramAPI($message);
-    }
+        try {
+            // Clean and prepare the message
+            $message = strip_tags($message, $this->accessTags);
+            $message = stripcslashes(html_entity_decode($message));
 
-    private function postTelegramAPI($text) {
-        error_log('ONTG Debug - Sending message to Telegram');
-        
-        $data = array(
-            'chat_id' => $this->chatID,
-            'text' => stripcslashes(html_entity_decode($text)),
-            'parse_mode' => $this->parseMode,
-        );
+            $data = [
+                'chat_id' => $this->chatID,
+                'text' => $message,
+                'parse_mode' => $this->parseMode,
+            ];
 
-        $args = array(
-            'timeout' => 15,
-            'redirection' => 5,
-            'httpversion' => '1.0',
-            'blocking' => true,
-            'headers' => array(),
-            'body' => $data,
-            'cookies' => array(),
-            'sslverify' => false
-        );
+            $args = [
+                'timeout' => 15,
+                'redirection' => 5,
+                'httpversion' => '1.0',
+                'blocking' => true,
+                'headers' => [],
+                'body' => $data,
+                'cookies' => [],
+                'sslverify' => false
+            ];
 
-        $response = wp_remote_post(
-            'https://api.telegram.org/bot' . $this->token . '/sendMessage',
-            $args
-        );
+            $response = wp_remote_post(
+                'https://api.telegram.org/bot' . $this->token . '/sendMessage',
+                $args
+            );
 
-        if (is_wp_error($response)) {
-            error_log('ONTG Error - ' . $response->get_error_message());
+            if (is_wp_error($response)) {
+                error_log('ONTG Error - ' . $response->get_error_message());
+                return false;
+            }
+
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+            
+            if (!isset($body['ok']) || $body['ok'] !== true) {
+                error_log('ONTG Error - API Error: ' . ($body['description'] ?? 'Unknown error'));
+                return false;
+            }
+
+            return true;
+            
+        } catch (\Exception $e) {
+            error_log('ONTG Error - Failed to send message: ' . $e->getMessage());
             return false;
         }
-
-        $body = json_decode(wp_remote_retrieve_body($response), true);
-        
-        if (!isset($body['ok']) || $body['ok'] !== true) {
-            error_log('ONTG Error - API Error: ' . ($body['description'] ?? 'Unknown error'));
-            return false;
-        }
-
-        error_log('ONTG Debug - Message sent successfully');
-        return true;
     }
 }

@@ -19,7 +19,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Plugin version
 define('ONTG_VERSION', '2.0.0');
 define('ONTG_FILE', __FILE__);
 define('ONTG_PATH', plugin_dir_path(ONTG_FILE));
@@ -65,3 +64,47 @@ if (!function_exists('ONTGInit')) {
 }
 
 add_action('plugins_loaded', 'ONTGInit');
+
+// Load translations
+add_action('init', function() {
+    load_plugin_textdomain(
+        'order-notification-for-telegram',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages'
+    );
+});
+
+// Plugin activation/deactivation
+register_activation_hook(__FILE__, 'ontg_activate');
+register_deactivation_hook(__FILE__, 'ontg_deactivate');
+
+function ontg_activate() {
+    add_option('ontg_version', ONTG_VERSION);
+    
+    // Set default template if not exists
+    if (!get_option('ontg_message_template')) {
+        $default_template = <<<TEMPLATE
+New order at {order_date_created}, ORDER ID: <b>#{order_id}</b>
+--
+address: 
+{billing_first_name} 
+{billing_address_1}, {billing_city}.
+{billing_phone}
+
+--
+Products: {products}
+Total: <b>{total}</b> 
+- {payment_method}
+
+---
+(<a href="admin_url/post.php?post={order_id}&action=edit">check order</a>) | (mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>) | copy: <code>{billing_phone}</code>
+TEMPLATE;
+        
+        add_option('ontg_message_template', $default_template);
+    }
+}
+
+function ontg_deactivate() {
+    delete_option('ontg_version');
+    // Settings are preserved by default
+}
