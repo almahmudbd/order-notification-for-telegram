@@ -82,16 +82,19 @@ class SettingPage extends \WC_Settings_Page {
                 'type'  => 'title',
                 'id'    => 'ontg_notification_section'
             ),
-            array(
-                'title'   => __('Send Notifications On', 'order-notification-for-telegram'),
-                'type'    => 'radio',
-                'id'      => 'ontg_send_on_status_change',
-                'options' => array(
-                    'no'  => __('New Order Only', 'order-notification-for-telegram'),
-                    'yes' => __('Order Status Change', 'order-notification-for-telegram')
-                ),
-                'default' => 'no',
-            ),
+            // Notification Settings Section
+			array(
+				'title'   => __('Send Notifications On', 'order-notification-for-telegram'),
+				'type'    => 'radio',
+				'id'      => 'ontg_send_on_status_change',
+				'options' => array(
+				'no'  => __('New Order Only', 'order-notification-for-telegram'),
+				'yes' => __('Order Status Change', 'order-notification-for-telegram')
+			),
+				'default' => 'no',
+				'desc'    => __('Choose when to send notifications', 'order-notification-for-telegram'),
+				'desc_tip' => true,
+			),
             array(
                 'title'    => __('Order Statuses', 'order-notification-for-telegram'),
                 'type'     => 'multiselect',

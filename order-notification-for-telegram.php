@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Order Notification For Telegram
  * Plugin URI: https://wordpress.org/plugins/order-notification-for-telegram/
- * Description: Send WooCommerce order notifications to Telegram
- * Version: 2.0.0
+ * Description: Send WooCommerce order notifications to Telegram.
+ * Version: 2.2.0
  * Author: Al Mahmud
  * Author URI: https://profiles.wordpress.org/almahmudbd
  * Text Domain: order-notification-for-telegram
@@ -16,57 +16,51 @@
  */
 
 if (!defined('ABSPATH')) {
-    exit;
+    exit; // Prevent direct access
 }
 
-define('ONTG_VERSION', '2.0.0');
+define('ONTG_VERSION', '2.2.0');
 define('ONTG_FILE', __FILE__);
 define('ONTG_PATH', plugin_dir_path(ONTG_FILE));
 define('ONTG_URL', plugin_dir_url(ONTG_FILE));
 
 // Autoloader
-spl_autoload_register(function($className) {
+spl_autoload_register(function ($className) {
     $namespace = 'OrderNotificationTelegram\\';
-    
     if (strpos($className, $namespace) !== 0) {
         return;
     }
-
-    $className = str_replace($namespace, '', $className);
-    $filePath = ONTG_PATH . str_replace('\\', '/', $className) . '.php';
-    
+    $relativeClass = str_replace($namespace, '', $className);
+    $filePath = ONTG_PATH . str_replace('\\', DIRECTORY_SEPARATOR, $relativeClass) . '.php';
     if (file_exists($filePath)) {
         require_once $filePath;
     }
 });
 
-// HPOS Compatibility
-add_action('before_woocommerce_init', function() {
+// WooCommerce HPOS Compatibility
+add_action('before_woocommerce_init', function () {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
     }
 });
 
 // Initialize plugin
-if (!function_exists('ONTGInit')) {
-    function ONTGInit() {
-        if (!class_exists('WooCommerce')) {
-            add_action('admin_notices', function() {
-                echo '<div class="error"><p>' . 
-                     esc_html__('Order Notification For Telegram requires WooCommerce to be installed and active.', 'order-notification-for-telegram') . 
-                     '</p></div>';
-            });
-            return;
-        }
-        
-        \OrderNotificationTelegram\Classes\Core::instance();
+add_action('plugins_loaded', function () {
+    if (!class_exists('WooCommerce')) {
+        add_action('admin_notices', function () {
+            echo '<div class="notice notice-error"><p>' .
+                esc_html__('Order Notification For Telegram requires WooCommerce to be installed and active.', 'order-notification-for-telegram') .
+                '</p></div>';
+        });
+        return;
     }
-}
 
-add_action('plugins_loaded', 'ONTGInit');
+    // Load Core plugin class
+    \OrderNotificationTelegram\Classes\Core::instance();
+});
 
 // Load translations
-add_action('init', function() {
+add_action('init', function () {
     load_plugin_textdomain(
         'order-notification-for-telegram',
         false,
@@ -74,37 +68,28 @@ add_action('init', function() {
     );
 });
 
-// Plugin activation/deactivation
+// Plugin activation and deactivation hooks
 register_activation_hook(__FILE__, 'ontg_activate');
 register_deactivation_hook(__FILE__, 'ontg_deactivate');
 
 function ontg_activate() {
+    if (!current_user_can('activate_plugins')) {
+        return;
+    }
+
+    // Add version and template defaults
     add_option('ontg_version', ONTG_VERSION);
-    
-    // Set default template if not exists
+
     if (!get_option('ontg_message_template')) {
-        $default_template = <<<TEMPLATE
-New order at {order_date_created}, ORDER ID: <b>#{order_id}</b>
---
-address: 
-{billing_first_name} 
-{billing_address_1}, {billing_city}.
-{billing_phone}
-
---
-Products: {products}
-Total: <b>{total}</b> 
-- {payment_method}
-
----
-(<a href="admin_url/post.php?post={order_id}&action=edit">check order</a>) | (mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>) | copy: <code>{billing_phone}</code>
-TEMPLATE;
-        
-        add_option('ontg_message_template', $default_template);
+        add_option('ontg_message_template', \OrderNotificationTelegram\Classes\TemplateManager::get_default_template());
     }
 }
 
 function ontg_deactivate() {
+    if (!current_user_can('activate_plugins')) {
+        return;
+    }
+
     delete_option('ontg_version');
-    // Settings are preserved by default
+    // Preserve user settings for future reactivation
 }
