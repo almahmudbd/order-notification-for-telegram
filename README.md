@@ -1,6 +1,3 @@
-এটা একটু পরিষ্কার/পেশাদার করে দিলাম, তোমার নতুন ফিচারগুলোও (fees, delivery charge, qty Bangla toggle, settings link, placeholders) ঠিকভাবে উল্লেখ করা আছে। কপি-পেস্ট করলেই হবে।
-
----
 
 ## Order Notification for Telegram
 
