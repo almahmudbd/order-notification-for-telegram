@@ -5,7 +5,7 @@ Send WooCommerce order notifications to Telegram.
 
 [![GitHub Downloads (all releases)](https://img.shields.io/github/downloads/almahmudbd/order-notification-for-telegram/total)](https://github.com/almahmudbd/order-notification-for-telegram/releases/latest)
 
----
+
 
 ## Description
 
