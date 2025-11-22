@@ -5,28 +5,28 @@ class SettingPage extends \WC_Settings_Page {
     public function __construct() {
         $this->id = 'ontg_settings';
         $this->label = __('Telegram Notifications', 'order-notification-for-telegram');
-        
+
         add_action('woocommerce_settings_' . $this->id, array($this, 'output'));
         add_action('woocommerce_settings_save_' . $this->id, array($this, 'save'));
-        
+
         parent::__construct();
     }
-    
+
     public function output() {
         global $current_section;
-        
-        // Header
+
         echo $this->render_header();
-        
-        // Settings Fields
+
         $settings = $this->get_settings($current_section);
         \WC_Admin_Settings::output_fields($settings);
-        
-        // Template Guide & Test Section
+
+        // ✅ Save button just ABOVE Template Guide
+        echo $this->render_save_button();
+
         echo $this->render_template_guide();
         echo $this->render_test_section();
     }
-    
+
     private function render_header() {
         return sprintf(
             '<div class="ontg-header">
@@ -37,14 +37,38 @@ class SettingPage extends \WC_Settings_Page {
             sprintf(__('Version %s', 'order-notification-for-telegram'), ONTG_VERSION),
             sprintf(
                 __('By %s', 'order-notification-for-telegram'),
-                '<a href="https://github.com/almahmudbd" target="_blank">Al Mahmud</a>'
+                '<a href="https://github.com/almahmudbd" target="_blank">almahmud</a>'
             )
         );
     }
-    
+
+    // ✅ Top save button + hide default WC save button at bottom to avoid duplicate
+    private function render_save_button() {
+        ob_start();
+        ?>
+        <style>
+            /* hide default WC save button row(s) */
+            .wrap.woocommerce form p.submit:not(.ontg-submit-top),
+            .wrap.woocommerce form .woocommerce-save-button:not(.ontg-save-btn){
+                display:none !important;
+            }
+        </style>
+
+        <p class="submit ontg-submit-top" style="margin: 10px 0 18px;">
+            <button name="save"
+                    class="button-primary woocommerce-save-button ontg-save-btn"
+                    type="submit"
+                    value="<?php echo esc_attr__('Save changes', 'woocommerce'); ?>">
+                <?php echo esc_html__('Save changes', 'woocommerce'); ?>
+            </button>
+        </p>
+        <?php
+        return ob_get_clean();
+    }
+
     public function get_settings($section = '') {
         $settings = array(
-            // Basic Settings Section
+            // Basic Settings
             array(
                 'title' => __('Basic Settings', 'order-notification-for-telegram'),
                 'type'  => 'title',
@@ -75,26 +99,25 @@ class SettingPage extends \WC_Settings_Page {
                 'type' => 'sectionend',
                 'id'   => 'ontg_basic_section_end'
             ),
-            
-            // Notification Settings Section
+
+            // Notification Settings
             array(
                 'title' => __('Notification Settings', 'order-notification-for-telegram'),
                 'type'  => 'title',
                 'id'    => 'ontg_notification_section'
             ),
-            // Notification Settings Section
-			array(
-				'title'   => __('Send Notifications On', 'order-notification-for-telegram'),
-				'type'    => 'radio',
-				'id'      => 'ontg_send_on_status_change',
-				'options' => array(
-				'no'  => __('New Order Only', 'order-notification-for-telegram'),
-				'yes' => __('Order Status Change', 'order-notification-for-telegram')
-			),
-				'default' => 'no',
-				'desc'    => __('Choose when to send notifications', 'order-notification-for-telegram'),
-				'desc_tip' => true,
-			),
+            array(
+                'title'   => __('Send Notifications On', 'order-notification-for-telegram'),
+                'type'    => 'radio',
+                'id'      => 'ontg_send_on_status_change',
+                'options' => array(
+                    'no'  => __('New Order Only', 'order-notification-for-telegram'),
+                    'yes' => __('Order Status Change', 'order-notification-for-telegram')
+                ),
+                'default'  => 'no',
+                'desc'     => __('Choose when to send notifications', 'order-notification-for-telegram'),
+                'desc_tip' => true,
+            ),
             array(
                 'title'    => __('Order Statuses', 'order-notification-for-telegram'),
                 'type'     => 'multiselect',
@@ -105,12 +128,23 @@ class SettingPage extends \WC_Settings_Page {
                 'default'  => array('wc-processing'),
                 'css'      => 'min-width: 350px;',
             ),
+
+            // Quantity Bangla checkbox
+            array(
+                'title'    => __('Quantity in Bangla', 'order-notification-for-telegram'),
+                'type'     => 'checkbox',
+                'id'       => 'ontg_qty_bangla',
+                'default'  => 'no',
+                'desc'     => __('Show quantity using Bangla digits (e.g., ২পিস). If unchecked, uses English digits (e.g., 2pcs).', 'order-notification-for-telegram'),
+                'desc_tip' => true,
+            ),
+
             array(
                 'type' => 'sectionend',
                 'id'   => 'ontg_notification_section_end'
             ),
-            
-            // Message Template Section
+
+            // Message Template
             array(
                 'title' => __('Message Template', 'order-notification-for-telegram'),
                 'type'  => 'title',
@@ -122,7 +156,7 @@ class SettingPage extends \WC_Settings_Page {
                 'type'     => 'textarea',
                 'id'       => 'ontg_message_template',
                 'default'  => $this->get_default_template(),
-                'css'      => 'min-width: 500px; min-height: 200px; font-family: monospace;',
+                'css'      => 'min-width: 500px; min-height: 220px; font-family: monospace;',
                 'class'    => 'code'
             ),
             array(
@@ -130,16 +164,15 @@ class SettingPage extends \WC_Settings_Page {
                 'id'   => 'ontg_template_section_end'
             ),
         );
-        
+
         return apply_filters('ontg_settings', $settings, $section);
     }
-    
+
     private function get_basic_help_text() {
-        $help = '<div class="ontg-help-text">';
+        $help  = '<div class="ontg-help-text">';
         $help .= '<p><strong>' . __('Quick Setup Guide:', 'order-notification-for-telegram') . '</strong></p>';
         $help .= '<ol>';
-        
-        // Step 1: Bot Token
+
         $help .= '<li>' . sprintf(
             __('Create a Telegram bot: Message %s and send:', 'order-notification-for-telegram'),
             '<a href="https://t.me/BotFather" target="_blank">@BotFather</a>'
@@ -150,150 +183,150 @@ class SettingPage extends \WC_Settings_Page {
                 <li>' . __('Follow the instructions and copy the bot token', 'order-notification-for-telegram') . '</li>
             </ul>
         </li>';
-        
-        // Step 2: Chat ID
+
         $help .= '<li>' . sprintf(
             __('Get your Chat ID: Message %s and send %s', 'order-notification-for-telegram'),
             '<a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>',
             '<code>/start</code>'
         ) . '</li>';
-        
-        // Step 3: Configuration
+
         $help .= '<li>' . __('Enter both the Bot Token and Chat ID above', 'order-notification-for-telegram') . '</li>';
-        
-        $help .= '</ol>';
-        $help .= '</div>';
-        
+
+        $help .= '</ol></div>';
         return $help;
     }
-    
+
     private function render_template_guide() {
         ob_start();
+
+        // ✅ ALL supported placeholders
+        $placeholders_text = <<<TXT
+Order:
+{order_id}
+{order_date_created}
+{order_date}
+{order_status}
+{total}
+{order_total}
+
+Payment:
+{payment_method}
+{payment_method_title}
+
+Products:
+{products}
+
+Delivery/Shipping:
+{delivery_charge}
+{delivery_method}
+
+Fees:
+{fees}
+{fees_total}
+
+Billing (underscore or dash both supported):
+{billing_first_name} / {billing-first_name}
+{billing_last_name}  / {billing-last_name}
+{billing_company}    / {billing-company}
+{billing_address_1}  / {billing-address_1}
+{billing_address_2}  / {billing-address_2}
+{billing_city}       / {billing-city}
+{billing_state}      / {billing-state}
+{billing_postcode}   / {billing-postcode}
+{billing_country}    / {billing-country}
+{billing_email}      / {billing-email}
+{billing_phone}      / {billing-phone}
+TXT;
+
+        // ✅ ALL supported tags
+        $tags_text = <<<TXT
+<b>bold</b>
+<i>italic</i>
+<u>underline</u>
+<s>strikethrough</s>
+<code>monospace</code>
+<a href="">link</a>
+TXT;
+
+        $codebox_style = 'width:100%;min-height:180px;background:#0b0b0b !important;color:#f5f5f5 !important;border:1px solid #2b2b2b;border-radius:8px;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:13px;line-height:1.5;white-space:pre;resize:vertical;';
         ?>
         <div class="ontg-template-guide">
+            <style>
+                .ontg-codegrid{
+                    display:grid;
+                    grid-template-columns:1fr 1fr;
+                    gap:16px;
+                    margin-top:10px;
+                }
+                @media (max-width:768px){
+                    .ontg-codegrid{ grid-template-columns:1fr; }
+                }
+                .ontg-example-wrap{ max-width:700px; }
+            </style>
+
             <h2><?php _e('Template Guide', 'order-notification-for-telegram'); ?></h2>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <!-- Available Placeholders -->
-                <div class="ontg-placeholders">
-                    <h3><?php _e('Available Placeholders', 'order-notification-for-telegram'); ?></h3>
-                    <table class="widefat">
-                        <thead>
-                            <tr>
-                                <th><?php _e('Placeholder', 'order-notification-for-telegram'); ?></th>
-                                <th><?php _e('Description', 'order-notification-for-telegram'); ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $placeholders = array(
-                                '{order_id}' => __('Order ID', 'order-notification-for-telegram'),
-                                '{order_date_created}' => __('Order Date and Time', 'order-notification-for-telegram'),
-                                '{total}' => __('Order Total Amount', 'order-notification-for-telegram'),
-                                '{products}' => __('Product List', 'order-notification-for-telegram'),
-                                '{billing_first_name}' => __('Customer\'s First Name', 'order-notification-for-telegram'),
-                                '{billing_phone}' => __('Customer\'s Phone', 'order-notification-for-telegram'),
-                                '{billing_address_1}' => __('Address Line 1', 'order-notification-for-telegram'),
-                                '{billing_city}' => __('City', 'order-notification-for-telegram'),
-                                '{payment_method}' => __('Payment Method', 'order-notification-for-telegram'),
-                            );
-                            
-                            foreach ($placeholders as $placeholder => $description) {
-                                printf(
-                                    '<tr><td><code>%s</code></td><td>%s</td></tr>',
-                                    esc_html($placeholder),
-                                    esc_html($description)
-                                );
-                            }
-                            ?>
-                        </tbody>
-                    </table>
+
+            <div class="ontg-codegrid">
+                <div>
+                    <h3 style="margin:0 0 6px;"><?php _e('Available Placeholders', 'order-notification-for-telegram'); ?></h3>
+                    <textarea readonly style="<?php echo esc_attr($codebox_style); ?>"><?php echo esc_textarea($placeholders_text); ?></textarea>
                 </div>
-                
-                <!-- HTML Tags -->
-                <div class="ontg-html-tags">
-                    <h3><?php _e('Supported HTML Tags', 'order-notification-for-telegram'); ?></h3>
-                    <table class="widefat">
-                        <thead>
-                            <tr>
-                                <th><?php _e('Tag', 'order-notification-for-telegram'); ?></th>
-                                <th><?php _e('Example', 'order-notification-for-telegram'); ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $tags = array(
-                                '<b>' => __('Bold text', 'order-notification-for-telegram'),
-                                '<i>' => __('Italic text', 'order-notification-for-telegram'),
-                                '<u>' => __('Underlined text', 'order-notification-for-telegram'),
-                                '<s>' => __('Strikethrough text', 'order-notification-for-telegram'),
-                                '<code>' => __('Monospace text', 'order-notification-for-telegram'),
-                                '<a href="">' => __('Link', 'order-notification-for-telegram'),
-                            );
-                            
-                            foreach ($tags as $tag => $example) {
-                                printf(
-                                    '<tr><td><code>%s</code></td><td>%s</td></tr>',
-                                    esc_html($tag),
-                                    esc_html($example)
-                                );
-                            }
-                            ?>
-                        </tbody>
-                    </table>
+
+                <div>
+                    <h3 style="margin:0 0 6px;"><?php _e('Supported HTML Tags', 'order-notification-for-telegram'); ?></h3>
+                    <textarea readonly style="<?php echo esc_attr($codebox_style); ?>"><?php echo esc_textarea($tags_text); ?></textarea>
                 </div>
             </div>
-            
-            <!-- Example Template -->
-            <div class="ontg-example-template" style="margin-top: 20px;">
-                <h3><?php _e('Example Template', 'order-notification-for-telegram'); ?></h3>
-                <pre style="background: #f8f8f8; padding: 15px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap;">
-New order at {order_date_created}, ORDER ID: <b>#{order_id}</b>
---
-address: 
-{billing_first_name} 
+
+            <div class="ontg-example-template ontg-example-wrap" style="margin-top:18px;">
+                <h3 style="margin:0 0 6px;"><?php _e('Example Template', 'order-notification-for-telegram'); ?></h3>
+
+                <textarea readonly style="<?php echo esc_attr($codebox_style); ?>min-height:220px;">New order at {order_date_created}, ORDER ID: <b>#{order_id}</b>
+------
+{billing_first_name} {billing_last_name}
 {billing_address_1}, {billing_city}.
-{billing_phone}
+<code>{billing_phone}</code>
 
---
-Products: {products}
-Total: <b>{total}</b> 
-- {payment_method}
+---{products}
 
----
-(<a href="admin_url/post.php?post={order_id}&action=edit">check order</a>) | (mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>) | copy: <code>{billing_phone}</code>
-                </pre>
+Delivery: {delivery_method} - {delivery_charge}
+Fees: {fees}
+Total: <b>{total}</b>
+- {payment_method_title}
+
+-----
+(<a href="admin_url/post.php?post={order_id}&action=edit">check order</a> | mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>)</textarea>
             </div>
         </div>
         <?php
         return ob_get_clean();
     }
-    
+
     private function render_test_section() {
         ob_start();
         ?>
         <div class="ontg-test-section">
             <h2><?php _e('Test Your Settings', 'order-notification-for-telegram'); ?></h2>
             <p><?php _e('Send a test message to verify your Telegram notification settings.', 'order-notification-for-telegram'); ?></p>
-            
+
             <button type="button" class="button button-primary" id="ontg-test-button">
                 <?php _e('Send Test Message', 'order-notification-for-telegram'); ?>
             </button>
             <span class="spinner" style="float: none; margin-top: 0;"></span>
-            <p class="ontg-test-result" style="display: none; margin-top: 10px;"></p>
+            <p class="ontg-test-result" style="display:none; margin-top:10px;"></p>
         </div>
-        
+
         <script>
         jQuery(document).ready(function($) {
             $('#ontg-test-button').click(function() {
                 var $button = $(this);
                 var $spinner = $button.next('.spinner');
                 var $result = $('.ontg-test-result');
-                
+
                 $button.prop('disabled', true);
                 $spinner.css('visibility', 'visible');
                 $result.hide();
-                
+
                 $.ajax({
                     url: ajaxurl,
                     type: 'POST',
@@ -324,26 +357,27 @@ Total: <b>{total}</b>
         <?php
         return ob_get_clean();
     }
-    
+
     private function get_default_template() {
         return <<<TEMPLATE
 New order at {order_date_created}, ORDER ID: <b>#{order_id}</b>
---
-address: 
-{billing_first_name} 
+------
+{billing_first_name} {billing_last_name}
 {billing_address_1}, {billing_city}.
-{billing_phone}
+<code>{billing_phone}</code>
 
---
-Products: {products}
-Total: <b>{total}</b> 
-- {payment_method}
+---{products}
 
----
-(<a href="' . admin_url("post.php?post={order_id}&action=edit") . '">check order</a>)) | (mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>) | copy: <code>{billing_phone}</code>
+Delivery: {delivery_method} - {delivery_charge}
+Fees: {fees}
+Total: <b>{total}</b>
+- {payment_method_title}
+
+-----
+(<a href="admin_url/post.php?post={order_id}&action=edit">check order</a> | mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>)
 TEMPLATE;
     }
-    
+
     public function save() {
         global $current_section;
         \WC_Admin_Settings::save_fields($this->get_settings($current_section));
