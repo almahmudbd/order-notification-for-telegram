@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Order Notification For Telegram
- * Plugin URI: https://wordpress.org/plugins/order-notification-for-telegram/
+ * Plugin URI: https://github.com/almahmudbd/order-notification-for-telegram
  * Description: Send WooCommerce order notifications to Telegram.
  * Version: 2.4.0
  * Author: almahmud & ChoPlugins
