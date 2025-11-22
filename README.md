@@ -17,6 +17,17 @@ This plugin allows you to receive WooCommerce order notifications directly on Te
 - HTML formatting support
 - Easy setup process
 
+## Quick Setup Guide:
+
+1. Download the plugin, then install and active it.
+2. Create a Telegram bot: Message [@BotFather](https://t.me/BotFather) and send:
+ ``/start`` then
+ ``/newbot``
+ Follow the instructions and copy the bot token
+3. Get your Chat ID: Message [@userinfobot](https://t.me/@userinfobot) and send /start
+4. or Get chat-group ID by adding this bot to your group : [@chatIDrobot](https://t.me/@chatIDrobot)
+5. Enter both the Bot Token and Chat ID in plugin setting.
+
 ## Installation
 
 1. Upload the plugin files to `/wp-content/plugins/order-notification-for-telegram`
