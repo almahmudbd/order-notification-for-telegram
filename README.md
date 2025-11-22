@@ -53,7 +53,7 @@ You can customize the message using placeholders, include product variations, de
    * Bot Token
    * Chat ID
 6. Customize message template using placeholders. then Click **Save settings**
-7. then **Send Test Message** or create a new order to send a verify your setup.
+7. then **Send Test Message** or create a new order to verify your setup.
 
 
 
