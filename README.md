@@ -2,6 +2,9 @@
 
 Send WooCommerce order notifications to Telegram.
 
+[![GitHub Downloads (all releases)](https://img.shields.io/github/downloads/almahmudbd/order-notification-for-telegram/total)](https://github.com/almahmudbd/order-notification-for-telegram/releases/latest)
+
+
 ## Description
 
 This plugin allows you to receive WooCommerce order notifications directly on Telegram. You can customize the notification message and choose when to receive notifications.
