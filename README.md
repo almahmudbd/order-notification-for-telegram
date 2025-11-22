@@ -17,21 +17,16 @@ You can customize the message using placeholders, include product variations, de
 ## Features
 
 * Instant Telegram notifications for WooCommerce orders
-* Send notifications on:
-
-  * **New Order only**, or
-  * **Order status change**
-* Fully customizable message template
+* Send notifications on: **New Order only** or **Order status change**
+* Fully customizable message template, Easy setup on Admin Panel
 * Product list with variation support (no duplicate variation text)
 * Smart quantity display:
 
   * Quantity hidden for **1 item**
   * Shows **2pcs / ২পিস** for multiple quantities
   * Optional toggle for Bangla quantity digits
-* Supports delivery/shipping charge and method placeholders
-* Supports gateway/extra fees placeholders
+* Supports delivery/shipping charge and method, extra fees placeholders
 * HTML formatting support (Telegram compatible)
-* Easy setup with test message button
 * HPOS (High-Performance Order Storage) compatible
 
 
