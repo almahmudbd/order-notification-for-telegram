@@ -1,0 +1,171 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Order Notification for Telegram\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-22 00:00+0000\n"
+"PO-Revision-Date: 2025-11-22 00:00+0000\n"
+"Last-Translator: almahmud\n"
+"Language-Team: Bangla\n"
+"Language: bn_BD\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+
+#: classes/SettingPage.php
+msgid "Telegram Notifications"
+msgstr "টেলিগ্রাম নোটিফিকেশন"
+
+#: classes/SettingPage.php
+msgid "Telegram Notifications for WooCommerce"
+msgstr "WooCommerce এর জন্য টেলিগ্রাম নোটিফিকেশন"
+
+#: classes/SettingPage.php
+msgid "Version %s"
+msgstr "ভার্সন %s"
+
+#: classes/SettingPage.php
+msgid "By %s"
+msgstr "ডেভেলপার: %s"
+
+#: classes/SettingPage.php
+msgid "Basic Settings"
+msgstr "বেসিক সেটিংস"
+
+#: classes/SettingPage.php
+msgid "Bot Token"
+msgstr "বট টোকেন"
+
+#: classes/SettingPage.php
+msgid "Enter your Telegram bot token from @BotFather"
+msgstr "@BotFather থেকে পাওয়া আপনার টেলিগ্রাম বট টোকেন দিন"
+
+#: classes/SettingPage.php
+msgid "Chat ID"
+msgstr "চ্যাট আইডি"
+
+#: classes/SettingPage.php
+msgid "Enter your Telegram chat ID from @userinfobot"
+msgstr "@userinfobot থেকে পাওয়া আপনার টেলিগ্রাম চ্যাট আইডি দিন"
+
+#: classes/SettingPage.php
+msgid "Notification Settings"
+msgstr "নোটিফিকেশন সেটিংস"
+
+#: classes/SettingPage.php
+msgid "Send Notifications On"
+msgstr "কখন নোটিফিকেশন পাঠাবে"
+
+#: classes/SettingPage.php
+msgid "New Order Only"
+msgstr "শুধু নতুন অর্ডার"
+
+#: classes/SettingPage.php
+msgid "Order Status Change"
+msgstr "অর্ডার স্ট্যাটাস পরিবর্তনে"
+
+#: classes/SettingPage.php
+msgid "Choose when to send notifications"
+msgstr "কখন নোটিফিকেশন পাঠানো হবে সেটি নির্বাচন করুন"
+
+#: classes/SettingPage.php
+msgid "Order Statuses"
+msgstr "অর্ডার স্ট্যাটাস সমূহ"
+
+#: classes/SettingPage.php
+msgid "Select order statuses that trigger notifications (Only applicable if \"Order Status Change\" is selected above)"
+msgstr "যে স্ট্যাটাসে নোটিফিকেশন যাবে সেগুলো নির্বাচন করুন (শুধু তখনই কাজ করবে যখন উপরে “অর্ডার স্ট্যাটাস পরিবর্তনে” সিলেক্ট করা থাকে)"
+
+#: classes/SettingPage.php
+msgid "Quantity in Bangla"
+msgstr "পরিমাণ বাংলা সংখ্যা"
+
+#: classes/SettingPage.php
+msgid "Show quantity using Bangla digits (e.g., ২পিস). If unchecked, uses English digits (e.g., 2pcs)."
+msgstr "পরিমাণ বাংলায় দেখাবে (যেমন ২পিস)। আনচেক থাকলে ইংরেজিতে দেখাবে (যেমন 2pcs)।"
+
+#: classes/SettingPage.php
+msgid "Message Template"
+msgstr "মেসেজ টেমপ্লেট"
+
+#: classes/SettingPage.php
+msgid "Customize your notification message using the placeholders below."
+msgstr "নিচের প্লেসহোল্ডার ব্যবহার করে নোটিফিকেশন মেসেজ কাস্টমাইজ করুন।"
+
+#: classes/SettingPage.php
+msgid "Quick Setup Guide:"
+msgstr "দ্রুত সেটআপ গাইড:"
+
+#: classes/SettingPage.php
+msgid "Create a Telegram bot: Message %s and send:"
+msgstr "টেলিগ্রাম বট তৈরি করুন: %s এ মেসেজ দিয়ে পাঠান:"
+
+#: classes/SettingPage.php
+msgid "Follow the instructions and copy the bot token"
+msgstr "নির্দেশনা অনুসরণ করে বট টোকেন কপি করুন"
+
+#: classes/SettingPage.php
+msgid "Get your Chat ID: Message %s and send %s"
+msgstr "আপনার চ্যাট আইডি নিন: %s এ মেসেজ দিন এবং %s পাঠান"
+
+#: classes/SettingPage.php
+msgid "Enter both the Bot Token and Chat ID below"
+msgstr "নিচে বট টোকেন এবং চ্যাট আইডি দুটোই দিন"
+
+#: classes/SettingPage.php
+msgid "Template Guide"
+msgstr "টেমপ্লেট গাইড"
+
+#: classes/SettingPage.php
+msgid "Available Placeholders"
+msgstr "উপলব্ধ প্লেসহোল্ডার"
+
+#: classes/SettingPage.php
+msgid "Supported HTML Tags"
+msgstr "সমর্থিত HTML ট্যাগ"
+
+#: classes/SettingPage.php
+msgid "Example Template"
+msgstr "উদাহরণ টেমপ্লেট"
+
+#: classes/SettingPage.php
+msgid "Tip: underscore/dash দুটোই কাজ করে (e.g. {billing_phone} বা {billing-phone})."
+msgstr "টিপস: আন্ডারস্কোর/ড্যাশ দুটোই কাজ করে (যেমন {billing_phone} অথবা {billing-phone})।"
+
+#: classes/SettingPage.php
+msgid "Test Your Settings"
+msgstr "সেটিংস পরীক্ষা করুন"
+
+#: classes/SettingPage.php
+msgid "Send a test message to verify your Telegram notification settings."
+msgstr "টেলিগ্রাম নোটিফিকেশন সেটিংস ঠিক আছে কি না যাচাই করতে একটি টেস্ট মেসেজ পাঠান।"
+
+#: classes/SettingPage.php
+msgid "Send Test Message"
+msgstr "টেস্ট মেসেজ পাঠান"
+
+#: classes/SettingPage.php
+msgid "Test message sent successfully! Check your Telegram."
+msgstr "টেস্ট মেসেজ সফলভাবে পাঠানো হয়েছে! টেলিগ্রাম চেক করুন।"
+
+#: classes/SettingPage.php
+msgid "Failed to send test message. Please check your settings."
+msgstr "টেস্ট মেসেজ পাঠানো যায়নি। দয়া করে সেটিংস চেক করুন।"
+
+#: classes/SettingPage.php
+msgid "Error: Could not send test message."
+msgstr "ত্রুটি: টেস্ট মেসেজ পাঠানো সম্ভব হয়নি।"
+
+
+#. Name of the plugin
+msgid "Order Notification For Telegram"
+msgstr "অর্ডার নোটিফিকেশন ফর টেলিগ্রাম"
+
+#. Description of the plugin
+msgid "Send WooCommerce order notifications to Telegram."
+msgstr "WooCommerce অর্ডার নোটিফিকেশন টেলিগ্রামে পাঠান।"
+
+#. Author of the plugin
+msgid "almahmud"
+msgstr "almahmud"
