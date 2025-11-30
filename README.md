@@ -1,79 +1,72 @@
-
 ## Order Notification for Telegram
 
-Send WooCommerce order notifications to Telegram.
+Send WooCommerce order notifications to Telegram instantly.
 
 [![GitHub Downloads (all releases)](https://img.shields.io/github/downloads/almahmudbd/order-notification-for-telegram/total)](https://github.com/almahmudbd/order-notification-for-telegram/releases/latest)
 
-
+---
 
 ## Description
 
-**Order Notification for Telegram** lets you receive WooCommerce order updates instantly in your Telegram chat or group.
-You can customize the message using placeholders, include product variations, delivery charge, gateway fees, and choose whether notifications are sent only for new orders or also on order status changes.
+**Order Notification for Telegram** is a lightweight WooCommerce plugin that sends order notifications directly to your Telegram account or group.
 
+You can fully customize the message template using placeholders, include delivery charges and extra gateway fees, and control how product quantities are displayed.
 
 
 ## Features
 
-* Instant Telegram notifications for WooCommerce orders
-* Send notifications on: **New Order only** or **Order status change**
-* Fully customizable message template, Easy setup on Admin Panel
-* Product list with variation support (no duplicate variation text)
-* Smart quantity display:
+- Instant WooCommerce order notifications in Telegram
+- Supports **New Order** and **Order Status Change** notifications
+- Fully customizable message template with a lot of placeholders
+- (new) Product list includes variations only once (no duplicate variation text)
+- (new) Optional numbered product list (1. 2. 3.) instead of dash list
+- (new) Quantity display options:
+  - Default English format: `x2` Optional Bangla format: `২টি`
+  - Optional: hide quantity when item count is 1
+  - Quantity is shown before product name when enabled
+- (new) Delivery charge & extra gateway fees placeholders supported
+- (new) Supports **multiple Chat/Group IDs** (comma-separated)
+- Telegram HTML formatting supported (safe tags only)
+- Clean baseline code (no legacy nktgnfw files)
 
-  * Quantity hidden for **1 item**
-  * Shows **2pcs / ২পিস** for multiple quantities
-  * Optional toggle for Bangla quantity digits
-* Supports delivery/shipping charge and method, extra fees placeholders
-* HTML formatting support (Telegram compatible)
-* HPOS (High-Performance Order Storage) compatible
 
 
 ## Quick Setup Guide
 
-1. Download and install the plugin, then activate it.
+1. Install and activate the plugin.
 2. Create a Telegram bot:
+   - Message **@BotFather**
+   - Send `/start` then `/newbot`
+   - Follow the instructions and copy your bot token
+3. Get your Chat ID:
+   - Message **@userinfobot**
+   - Send `/start`
+4. To get a Group ID:
+   - Message **@chatIDrobot**
+   - Add that bot to your group
+5. Go to **WooCommerce → Settings → Telegram Notifications**
+6. Enter your **Bot Token** and **Chat/Group ID**
+   - You can enter multiple IDs separated by comma  
+     Example: `-1001234567890, 12345678`
 
-   * Message [@BotFather](https://t.me/BotFather)
-   * Send:
+## Screenshots
 
-     * `/start`
-     * `/newbot`
-   * Follow instructions and copy the **Bot Token**.
-3. Get your **Chat ID**:
-
-   * Message [@userinfobot](https://t.me/userinfobot) and send `/start`.
-4. For group chat notifications:
-
-   * Add [@chatIDrobot](https://t.me/chatIDrobot) to your group and get the ID.
-   * Then add your newly created bot to the same group.
-5. Go to **WooCommerce → Settings → Telegram Notifications** and paste:
-
-   * Bot Token
-   * Chat ID
-6. Customize message template using placeholders. then Click **Save settings**
-7. then **Send Test Message** or create a new order to verify your setup.
-
-
-
-## Installation
-
-1. Upload the plugin files to:
-   `/wp-content/plugins/order-notification-for-telegram`
-2. Activate the plugin from **Plugins → Installed Plugins**.
-3. Go to:
-   **WooCommerce → Settings → Telegram Notifications**
-   or click **Settings** under the plugin name from the Plugins page.
-
+![Screenshot 1](assets/screenshot-1.png)
+![Screenshot 2](assets/screenshot-2.png)
+![Screenshot 3](assets/screenshot-3.png)
 
 
 ## Support
 
-For support, please [create an issue](https://github.com/almahmudbd/order-notification-for-telegram/issues) in the GitHub repository.
+For bugs, feature requests, or help:  
+- Open an issue on GitHub  
+- Or contact the main author
 
+---
 
 ## Credits
 
-* Based on choplugins' plugin:
-  [https://choplugins.com/en/product/order-notification-for-telegram](https://choplugins.com/en/product/order-notification-for-telegram)
+Originally based on ChoPlugins' version:  
+https://choplugins.com/en/product/order-notification-for-telegram
+
+Maintained & improved by almahmud.

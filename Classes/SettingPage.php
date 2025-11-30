@@ -2,8 +2,9 @@
 namespace OrderNotificationTelegram\Classes;
 
 class SettingPage extends \WC_Settings_Page {
+
     public function __construct() {
-        $this->id = 'ontg_settings';
+        $this->id    = 'ontg_settings';
         $this->label = __('Telegram Notifications', 'order-notification-for-telegram');
 
         add_action('woocommerce_settings_' . $this->id, array($this, 'output'));
@@ -20,41 +21,50 @@ class SettingPage extends \WC_Settings_Page {
         $settings = $this->get_settings($current_section);
         \WC_Admin_Settings::output_fields($settings);
 
-        // ✅ Save button just ABOVE Template Guide
+        // Save button just ABOVE Template Guide
         echo $this->render_save_button();
 
         echo $this->render_template_guide();
         echo $this->render_test_section();
+
+        // SVG icon at the very bottom
+        echo $this->render_footer_logo();
     }
 
-    private function render_header() {
-        return sprintf(
-            '<div class="ontg-header">
-                <h1><span class="dashicons dashicons-admin-plugins"></span>%s</h1>
-                <p>%s | %s</p>
-            </div>',
-            esc_html__('Telegram Notifications for WooCommerce', 'order-notification-for-telegram'),
-            sprintf(__('Version %s', 'order-notification-for-telegram'), ONTG_VERSION),
-            sprintf(
-                __('By %s', 'order-notification-for-telegram'),
-                '<a href="https://github.com/almahmudbd" target="_blank">almahmud</a>'
-            )
-        );
-    }
+private function render_header() {
+    return sprintf(
+        '<div class="ontg-header" style="margin:20px 0;padding:18px 20px;background:#fff;border:1px solid #e5e5e5;border-radius:8px;">
+            <h1 style="margin:0 0 6px;font-size:22px;display:flex;align-items:center;gap:8px;">
+                <span class="dashicons dashicons-admin-plugins"></span>%s
+            </h1>
+            <p style="margin:0;color:#666;font-size:13px;">%s | %s</p>
+        </div>',
+        esc_html__('Order Notifications for Telegram', 'order-notification-for-telegram'),
+        sprintf(__('Version %s', 'order-notification-for-telegram'), ONTG_VERSION),
+        sprintf(
+            __('By %s', 'order-notification-for-telegram'),
+            '<a href="https://github.com/almahmudbd" target="_blank">almahmud</a>'
+        )
+    );
+}
 
-    // ✅ Top save button + hide default WC save button at bottom to avoid duplicate
+
+
+    /**
+     * Top save button + hide default WC bottom save row (CSS only)
+     */
     private function render_save_button() {
         ob_start();
         ?>
         <style>
-            /* hide default WC save button row(s) */
+            /* Hide default WC save row(s) */
             .wrap.woocommerce form p.submit:not(.ontg-submit-top),
             .wrap.woocommerce form .woocommerce-save-button:not(.ontg-save-btn){
-                display:none !important;
+                display: none !important;
             }
         </style>
 
-        <p class="submit ontg-submit-top" style="margin: 10px 0 18px;">
+        <p class="submit ontg-submit-top" style="margin:10px 0 18px;">
             <button name="save"
                     class="button-primary woocommerce-save-button ontg-save-btn"
                     type="submit"
@@ -67,7 +77,9 @@ class SettingPage extends \WC_Settings_Page {
     }
 
     public function get_settings($section = '') {
+
         $settings = array(
+
             // Basic Settings
             array(
                 'title' => __('Basic Settings', 'order-notification-for-telegram'),
@@ -82,17 +94,17 @@ class SettingPage extends \WC_Settings_Page {
                 'id'       => 'ontg_bot_token',
                 'default'  => '',
                 'class'    => 'regular-text',
-                'css'      => 'min-width: 400px;',
+                'css'      => 'min-width:400px;',
                 'desc_tip' => true,
             ),
             array(
-                'title'    => __('Chat ID', 'order-notification-for-telegram'),
+                'title'    => __('Chat ID / Group ID', 'order-notification-for-telegram'),
                 'type'     => 'text',
-                'desc'     => __('Enter your Telegram chat ID from @userinfobot', 'order-notification-for-telegram'),
+                'desc'     => __('Enter your Telegram chat ID (user or group). You can enter multiple IDs separated by comma (e.g., -100xxx, 12345678). Notifications will be sent to all of them.', 'order-notification-for-telegram'),
                 'id'       => 'ontg_chat_id',
                 'default'  => '',
                 'class'    => 'regular-text',
-                'css'      => 'min-width: 400px;',
+                'css'      => 'min-width:400px;',
                 'desc_tip' => true,
             ),
             array(
@@ -126,19 +138,8 @@ class SettingPage extends \WC_Settings_Page {
                 'class'    => 'wc-enhanced-select',
                 'options'  => wc_get_order_statuses(),
                 'default'  => array('wc-processing'),
-                'css'      => 'min-width: 350px;',
+                'css'      => 'min-width:350px;',
             ),
-
-            // Quantity Bangla checkbox
-            array(
-                'title'    => __('Quantity in Bangla', 'order-notification-for-telegram'),
-                'type'     => 'checkbox',
-                'id'       => 'ontg_qty_bangla',
-                'default'  => 'no',
-                'desc'     => __('Show quantity using Bangla digits (e.g., ২পিস). If unchecked, uses English digits (e.g., 2pcs).', 'order-notification-for-telegram'),
-                'desc_tip' => true,
-            ),
-
             array(
                 'type' => 'sectionend',
                 'id'   => 'ontg_notification_section_end'
@@ -156,9 +157,36 @@ class SettingPage extends \WC_Settings_Page {
                 'type'     => 'textarea',
                 'id'       => 'ontg_message_template',
                 'default'  => $this->get_default_template(),
-                'css'      => 'min-width: 500px; min-height: 220px; font-family: monospace;',
+                'css'      => 'min-width:500px; min-height:220px; font-family: monospace;',
                 'class'    => 'code'
             ),
+            array(
+                'title'    => __('Quantity in Bangla', 'order-notification-for-telegram'),
+                'type'     => 'checkbox',
+                'id'       => 'ontg_qty_bangla',
+                'default'  => 'no',
+                'desc'     => __('Enable to show quantity like ২টি. Disable to show x2.', 'order-notification-for-telegram'),
+                'desc_tip' => true,
+            ),
+
+            array(
+                'title'    => __('Numbered product list', 'order-notification-for-telegram'),
+                'type'     => 'checkbox',
+                'id'       => 'ontg_numbered_products',
+                'default'  => 'no',
+                'desc'     => __('Enable to show products as 1. 2. 3. (Dash will be removed).', 'order-notification-for-telegram'),
+                'desc_tip' => true,
+            ),
+
+            array(
+                'title'    => __('Hide quantity for single item', 'order-notification-for-telegram'),
+                'type'     => 'checkbox',
+                'id'       => 'ontg_hide_single_qty',
+                'default'  => 'yes',
+                'desc'     => __('If enabled, quantity will be hidden when an item quantity is 1.', 'order-notification-for-telegram'),
+                'desc_tip' => true,
+            ),
+
             array(
                 'type' => 'sectionend',
                 'id'   => 'ontg_template_section_end'
@@ -178,19 +206,23 @@ class SettingPage extends \WC_Settings_Page {
             '<a href="https://t.me/BotFather" target="_blank">@BotFather</a>'
         ) . '
             <ul>
-                <li><code>/start</code></li>
-                <li><code>/newbot</code></li>
-                <li>' . __('Follow the instructions and copy the bot token', 'order-notification-for-telegram') . '</li>
+                <li><code>/start</code> then <code>/newbot</code></li>
+                <li>' . __('Follow the instructions and copy the bot token.', 'order-notification-for-telegram') . '</li>
             </ul>
         </li>';
 
         $help .= '<li>' . sprintf(
-            __('Get your Chat ID: Message %s and send %s', 'order-notification-for-telegram'),
+            __('Get your Chat ID: Message %s and send %s.', 'order-notification-for-telegram'),
             '<a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>',
             '<code>/start</code>'
         ) . '</li>';
 
-        $help .= '<li>' . __('Enter both the Bot Token and Chat ID above', 'order-notification-for-telegram') . '</li>';
+        $help .= '<li>' . sprintf(
+            __('To get your Group ID: Message %s, then add that bot to your group.', 'order-notification-for-telegram'),
+            '<a href="https://t.me/chatIDrobot" target="_blank">@chatIDrobot</a>'
+        ) . '</li>';
+
+        $help .= '<li>' . __('Enter both the Bot Token and Chat/Group ID below.', 'order-notification-for-telegram') . '</li>';
 
         $help .= '</ol></div>';
         return $help;
@@ -199,7 +231,6 @@ class SettingPage extends \WC_Settings_Page {
     private function render_template_guide() {
         ob_start();
 
-        // ✅ ALL supported placeholders
         $placeholders_text = <<<TXT
 Order:
 {order_id}
@@ -238,7 +269,6 @@ Billing (underscore or dash both supported):
 {billing_phone}      / {billing-phone}
 TXT;
 
-        // ✅ ALL supported tags
         $tags_text = <<<TXT
 <b>bold</b>
 <i>italic</i>
@@ -280,22 +310,7 @@ TXT;
 
             <div class="ontg-example-template ontg-example-wrap" style="margin-top:18px;">
                 <h3 style="margin:0 0 6px;"><?php _e('Example Template', 'order-notification-for-telegram'); ?></h3>
-
-                <textarea readonly style="<?php echo esc_attr($codebox_style); ?>min-height:220px;">New order at {order_date_created}, ORDER ID: <b>#{order_id}</b>
-------
-{billing_first_name} {billing_last_name}
-{billing_address_1}, {billing_city}.
-<code>{billing_phone}</code>
-
----{products}
-
-Delivery: {delivery_method} - {delivery_charge}
-Fees: {fees}
-Total: <b>{total}</b>
-- {payment_method_title}
-
------
-(<a href="admin_url/post.php?post={order_id}&action=edit">check order</a> | mgs <a href="https://wa.me/88{billing_phone}">whatsapp</a>)</textarea>
+                <textarea readonly style="<?php echo esc_attr($codebox_style); ?>min-height:220px;"><?php echo esc_textarea($this->get_default_template()); ?></textarea>
             </div>
         </div>
         <?php
@@ -356,6 +371,20 @@ Total: <b>{total}</b>
         </script>
         <?php
         return ob_get_clean();
+    }
+
+    /**
+     * Render SVG logo at very bottom
+     */
+    private function render_footer_logo() {
+        $svg_url = ONTG_URL . 'assets/images/tele_woo-banner.svg';
+
+        return sprintf(
+            '<div class="ontg-footer-logo" style="text-align:center;margin:30px 0 10px;opacity:0.9;">
+                <img src="%s" alt="Telegram Woo" style="max-width:480px;height:auto;display:inline-block;" />
+            </div>',
+            esc_url($svg_url)
+        );
     }
 
     private function get_default_template() {

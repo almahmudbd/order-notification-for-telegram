@@ -6,7 +6,7 @@ class Core {
     private $telegram;
 
     const DEFAULT_TIMEOUT = 15;
-    const DEFAULT_STATUS = 'wc-processing';
+    const DEFAULT_STATUS  = 'wc-processing';
 
     public static function instance() {
         if (is_null(self::$instance)) {
@@ -26,11 +26,12 @@ class Core {
         add_action('wp_ajax_ontg_test_notification', [$this, 'handle_test_notification']);
 
         if (get_option('ontg_send_on_status_change', 'no') === 'yes') {
+            // Status change mode
             add_action('woocommerce_order_status_changed', [$this, 'handle_order_status_change'], 10, 4);
         } else {
             /**
-             * ✅ Fix: Use checkout processed hook instead of new_order.
-             * This ensures items, shipping, fees, totals are fully saved.
+             * Fix for "New Order Only":
+             * Use checkout processed hook so items/shipping/fees are saved.
              */
             add_action('woocommerce_checkout_order_processed', [$this, 'handle_new_order'], 20, 1);
         }
@@ -46,7 +47,7 @@ class Core {
     }
 
     private function setup_telegram() {
-        $token = get_option('ontg_bot_token');
+        $token   = get_option('ontg_bot_token');
         $chat_id = get_option('ontg_chat_id');
         $this->telegram = new Sender();
         $this->telegram->set_credentials($token, $chat_id);
@@ -60,8 +61,8 @@ class Core {
             }
 
             $template = get_option('ontg_message_template', TemplateManager::get_default_template());
-            $wc = new WooCommerce($order);
-            $message = $wc->get_formatted_message($template);
+            $wc       = new WooCommerce($order);
+            $message  = $wc->get_formatted_message($template);
 
             if ($this->telegram->send_message($message)) {
                 $order->update_meta_data('_ontg_notification_sent', 'yes');
@@ -88,7 +89,7 @@ class Core {
         check_ajax_referer('ontg_test_notification', 'nonce');
 
         try {
-            $token = get_option('ontg_bot_token');
+            $token   = get_option('ontg_bot_token');
             $chat_id = get_option('ontg_chat_id');
 
             $test_message = TemplateManager::get_default_template();
@@ -100,10 +101,7 @@ class Core {
                 wp_send_json_error(__('Failed to send test message. Please check your settings.', 'order-notification-for-telegram'));
             }
         } catch (\Exception $e) {
-            wp_send_json_error(sprintf(
-                __('Error: %s', 'order-notification-for-telegram'),
-                $e->getMessage()
-            ));
+            wp_send_json_error(sprintf(__('Error: %s', 'order-notification-for-telegram'), $e->getMessage()));
         }
     }
 }

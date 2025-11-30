@@ -3,9 +3,9 @@
  * Plugin Name: Order Notification For Telegram
  * Plugin URI: https://github.com/almahmudbd/order-notification-for-telegram
  * Description: Send WooCommerce order notifications to Telegram.
- * Version: 2.4.2
- * Author: almahmud & ChoPlugins
- * Author URI: https://github.com/almahmudbd
+ * Version: 2.5.0
+ * Author: almahmud
+ * Author URI: https://thealmahmud.blogspot.com/
  * Text Domain: order-notification-for-telegram
  * Domain Path: /languages
  * Requires at least: 5.8
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
     exit; // Prevent direct access
 }
 
-define('ONTG_VERSION', '2.4.0');
+define('ONTG_VERSION', '2.5.0');
 define('ONTG_FILE', __FILE__);
 define('ONTG_PATH', plugin_dir_path(ONTG_FILE));
 define('ONTG_URL', plugin_dir_url(ONTG_FILE));
@@ -59,7 +59,7 @@ add_action('plugins_loaded', function () {
     \OrderNotificationTelegram\Classes\Core::instance();
 });
 
-// ✅ Add "Settings" link under plugin name on Plugins page
+// Add "Settings" link under plugin name on Plugins page
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function ($links) {
     $settings_url = admin_url('admin.php?page=wc-settings&tab=ontg_settings');
     $settings_link = '<a href="' . esc_url($settings_url) . '">' . esc_html__('Settings', 'order-notification-for-telegram') . '</a>';
@@ -67,6 +67,7 @@ add_filter('plugin_action_links_' . plugin_basename(__FILE__), function ($links)
     array_unshift($links, $settings_link);
     return $links;
 });
+
 
 // Load translations
 add_action('init', function () {

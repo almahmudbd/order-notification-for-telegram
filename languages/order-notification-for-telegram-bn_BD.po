@@ -1,0 +1,198 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Order Notification for Telegram\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-30 00:00+0000\n"
+"PO-Revision-Date: 2025-11-30 00:00+0000\n"
+"Last-Translator: almahmud\n"
+"Language-Team: \n"
+"Language: bn_BD\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: ChatGPT\n"
+
+#: classes/SettingPage.php
+msgid "Telegram Notifications"
+msgstr "টেলিগ্রাম নোটিফিকেশন"
+
+#: classes/SettingPage.php
+msgid "Telegram Notifications for WooCommerce"
+msgstr "WooCommerce এর জন্য টেলিগ্রাম নোটিফিকেশন"
+
+#: classes/SettingPage.php
+msgid "Order Notifications for Telegram"
+msgstr "টেলিগ্রামের জন্য অর্ডার নোটিফিকেশন"
+
+#: classes/SettingPage.php
+msgid "Version %s"
+msgstr "ভার্সন %s"
+
+#: classes/SettingPage.php
+msgid "By %s"
+msgstr "ডেভেলপার: %s"
+
+#: classes/SettingPage.php
+msgid "Save changes"
+msgstr "সেভ করুন"
+
+#: classes/SettingPage.php
+msgid "Basic Settings"
+msgstr "বেসিক সেটিংস"
+
+#: classes/SettingPage.php
+msgid "Bot Token"
+msgstr "বট টোকেন"
+
+#: classes/SettingPage.php
+msgid "Enter your Telegram bot token from @BotFather"
+msgstr "@BotFather থেকে পাওয়া টেলিগ্রাম বট টোকেন দিন"
+
+#: classes/SettingPage.php
+msgid "Chat ID / Group ID"
+msgstr "চ্যাট আইডি / গ্রুপ আইডি"
+
+#: classes/SettingPage.php
+msgid "Enter your Telegram chat ID (user or group)."
+msgstr "আপনার টেলিগ্রাম চ্যাট আইডি দিন (ইউজার বা গ্রুপ)"
+
+#: classes/SettingPage.php
+msgid "Enter your Telegram chat ID (user or group). You can add multiple IDs separated by comma."
+msgstr "আপনার টেলিগ্রাম চ্যাট আইডি দিন (ইউজার বা গ্রুপ)। কমা দিয়ে একাধিক আইডিও দিতে পারবেন।"
+
+#: classes/SettingPage.php
+msgid "Notification Settings"
+msgstr "নোটিফিকেশন সেটিংস"
+
+#: classes/SettingPage.php
+msgid "Send Notifications On"
+msgstr "নোটিফিকেশন পাঠাবে"
+
+#: classes/SettingPage.php
+msgid "New Order Only"
+msgstr "শুধু নতুন অর্ডারে"
+
+#: classes/SettingPage.php
+msgid "Order Status Change"
+msgstr "অর্ডার স্ট্যাটাস বদলালে"
+
+#: classes/SettingPage.php
+msgid "Choose when to send notifications"
+msgstr "কখন নোটিফিকেশন যাবে সেটা সিলেক্ট করুন"
+
+#: classes/SettingPage.php
+msgid "Order Statuses"
+msgstr "অর্ডার স্ট্যাটাস"
+
+#: classes/SettingPage.php
+msgid "Select order statuses that trigger notifications (Only applicable if \"Order Status Change\" is selected above)"
+msgstr "যে স্ট্যাটাসগুলোতে নোটিফিকেশন যাবে সেগুলো সিলেক্ট করুন (উপরের অপশন \"অর্ডার স্ট্যাটাস বদলালে\" হলে প্রযোজ্য)"
+
+#: classes/SettingPage.php
+msgid "Message Template"
+msgstr "মেসেজ টেমপ্লেট"
+
+#: classes/SettingPage.php
+msgid "Customize your notification message using the placeholders below."
+msgstr "নিচের প্লেসহোল্ডারগুলো ব্যবহার করে আপনার মেসেজ টেমপ্লেট কাস্টমাইজ করুন।"
+
+#: classes/SettingPage.php
+msgid "Quantity in Bangla"
+msgstr "কোয়ান্টিটি বাংলায়"
+
+#: classes/SettingPage.php
+msgid "Enable to show quantity like ২টি. Disable to show x2."
+msgstr "অন করলে কোয়ান্টিটি ২টি এর মতো দেখাবে। অফ করলে x2 দেখাবে।"
+
+#: classes/SettingPage.php
+msgid "Numbered product list"
+msgstr "নাম্বারিং করা প্রোডাক্ট লিস্ট"
+
+#: classes/SettingPage.php
+msgid "Enable to show products as 1. 2. 3. (Dash will be removed)."
+msgstr "অন করলে প্রোডাক্টগুলো ১. ২. ৩. এভাবে দেখাবে (ড্যাশ থাকবে না)।"
+
+#: classes/SettingPage.php
+msgid "Hide quantity for single item"
+msgstr "১ পিস হলে কোয়ান্টিটি লুকাও"
+
+#: classes/SettingPage.php
+msgid "If enabled, quantity will be hidden when an item quantity is 1."
+msgstr "অন থাকলে কোনো আইটেম ১ পিস হলে কোয়ান্টিটি দেখাবে না।"
+
+#: classes/SettingPage.php
+msgid "Quick Setup Guide:"
+msgstr "দ্রুত সেটআপ গাইড:"
+
+#: classes/SettingPage.php
+msgid "Create a Telegram bot: Message %s and send:"
+msgstr "একটি টেলিগ্রাম বট বানান: %s এ মেসেজ পাঠিয়ে লিখুন:"
+
+#: classes/SettingPage.php
+msgid "Follow the instructions and copy the bot token."
+msgstr "নির্দেশনা অনুসরণ করে বট টোকেন কপি করুন।"
+
+#: classes/SettingPage.php
+msgid "Get your Chat ID: Message %s and send %s."
+msgstr "চ্যাট আইডি পেতে: %s এ মেসেজ পাঠিয়ে %s লিখুন।"
+
+#: classes/SettingPage.php
+msgid "To get your Group ID: Message %s, then add that bot to your group."
+msgstr "গ্রুপ আইডি পেতে: %s এ মেসেজ পাঠিয়ে বটটিকে আপনার গ্রুপে অ্যাড করুন।"
+
+#: classes/SettingPage.php
+msgid "You can enter multiple Chat/Group IDs separated by comma (e.g., -100xxx, 12345678). Notifications will be sent to all of them."
+msgstr "কমা দিয়ে একাধিক চ্যাট/গ্রুপ আইডি দিতে পারবেন (যেমন: -100xxx, 12345678)। সবগুলো জায়গায় নোটিফিকেশন যাবে।"
+
+#: classes/SettingPage.php
+msgid "Enter both the Bot Token and Chat/Group ID below."
+msgstr "নিচে বট টোকেন এবং চ্যাট/গ্রুপ আইডি দিন।"
+
+#: classes/SettingPage.php
+msgid "Template Guide"
+msgstr "টেমপ্লেট গাইড"
+
+#: classes/SettingPage.php
+msgid "Available Placeholders"
+msgstr "সাপোর্টেড প্লেসহোল্ডার"
+
+#: classes/SettingPage.php
+msgid "Supported HTML Tags"
+msgstr "সাপোর্টেড HTML ট্যাগ"
+
+#: classes/SettingPage.php
+msgid "Example Template"
+msgstr "উদাহরণ টেমপ্লেট"
+
+#: classes/SettingPage.php
+msgid "Test Your Settings"
+msgstr "সেটিং টেস্ট করুন"
+
+#: classes/SettingPage.php
+msgid "Send a test message to verify your Telegram notification settings."
+msgstr "টেলিগ্রাম নোটিফিকেশন ঠিকভাবে কাজ করছে কিনা টেস্ট মেসেজ পাঠিয়ে দেখুন।"
+
+#: classes/SettingPage.php
+msgid "Send Test Message"
+msgstr "টেস্ট মেসেজ পাঠান"
+
+#: classes/SettingPage.php
+msgid "Error: Could not send test message."
+msgstr "এরর: টেস্ট মেসেজ পাঠানো যায়নি।"
+
+#: classes/Core.php
+msgid "Test message sent successfully! Check your Telegram."
+msgstr "টেস্ট মেসেজ সফলভাবে পাঠানো হয়েছে! টেলিগ্রাম চেক করুন।"
+
+#: classes/Core.php
+msgid "Failed to send test message. Please check your settings."
+msgstr "টেস্ট মেসেজ পাঠানো যায়নি। দয়া করে সেটিংস চেক করুন।"
+
+#: classes/Core.php
+msgid "Error: %s"
+msgstr "এরর: %s"
+
+#: order-notification-for-telegram.php
+msgid "Order Notification For Telegram requires WooCommerce to be installed and active."
+msgstr "Order Notification For Telegram প্লাগিন চালাতে WooCommerce ইনস্টল এবং অ্যাকটিভ থাকতে হবে।"
