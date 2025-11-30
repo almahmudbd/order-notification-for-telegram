@@ -52,8 +52,8 @@ You can fully customize the message template using placeholders, include deliver
 ## Screenshots
 
 ![Screenshot 1](assets/Screenshot-1.png)
-![Screenshot 2](assets/Screenshot-1.png)
-![Screenshot 3](assets/Screenshot-1.png)
+![Screenshot 2](assets/Screenshot-2.png)
+![Screenshot 3](assets/Screenshot-3.png)
 
 
 ## Support
